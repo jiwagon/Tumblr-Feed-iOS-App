@@ -6,17 +6,35 @@
 import UIKit
 import Nuke
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    var posts: [Post] = []
 
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return posts.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PostCell", for: indexPath)
+        let post = posts[indexPath.row]
+        // Configure your cell with post data. For instance, if your cell has a label to display summary:
+        cell.textLabel?.text = post.summary
 
+        return cell
+    }
+    
+    
+    @IBOutlet weak var postsTableView: UITableView!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        
         fetchPosts()
+        
+        // Added dataSource and delegate
+        postsTableView.dataSource = self
+        postsTableView.delegate = self
     }
-
-
 
     func fetchPosts() {
         let url = URL(string: "https://api.tumblr.com/v2/blog/humansofnewyork/posts/photo?api_key=1zT8CiXGXFcQDyMFG7RtcfGLwTdDjFUJnZzKJaWTmgyK4lKGYk")!
@@ -42,7 +60,6 @@ class ViewController: UIViewController {
                 DispatchQueue.main.async { [weak self] in
 
                     let posts = blog.response.posts
-
 
                     print("✅ We got \(posts.count) posts!")
                     for post in posts {
